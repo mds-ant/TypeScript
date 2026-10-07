@@ -358,6 +358,11 @@ func createSymbolTable(symbols []*ast.Symbol) ast.SymbolTable {
 	return result
 }
 
+// Use getSymbolId instead of ast.GetSymbolId in this package so the IDs a checker assigns stay in first-touch order.
+func (c *Checker) getSymbolId(symbol *ast.Symbol) ast.SymbolId {
+	return c.ids.GetSymbolId(symbol)
+}
+
 func (c *Checker) sortSymbols(symbols []*ast.Symbol) {
 	slices.SortFunc(symbols, c.compareSymbols)
 }
@@ -384,9 +389,15 @@ func (c *Checker) compareSymbolsWorker(s1, s2 *ast.Symbol) int {
 	if r := strings.Compare(s1.Name, s2.Name); r != 0 {
 		return r
 	}
-	// Fall back to symbol IDs. This is a last resort that should happen only when symbols have
-	// no declaration and duplicate names.
-	return int(ast.GetSymbolId(s1)) - int(ast.GetSymbolId(s2))
+	// A checker-made copy sorts after the declared symbol it copies, whatever order their IDs were assigned in.
+	if t1, t2 := s1.Flags&ast.SymbolFlagsTransient != 0, s2.Flags&ast.SymbolFlagsTransient != 0; t1 != t2 {
+		if t1 {
+			return 1
+		}
+		return -1
+	}
+	// Fall back to symbol IDs, which only order symbols created by the same checker reliably.
+	return int(c.getSymbolId(s1)) - int(c.getSymbolId(s2))
 }
 
 func (c *Checker) compareNodes(n1, n2 *ast.Node) int {

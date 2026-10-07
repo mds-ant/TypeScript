@@ -1670,7 +1670,7 @@ func (c *Checker) writeFlowCacheKey(b *keyBuilder, node *ast.Node, declaredType 
 			if symbol == c.unknownSymbol {
 				return false
 			}
-			b.writeSymbol(symbol)
+			b.writeSymbolId(c.getSymbolId(symbol))
 		}
 		fallthrough
 	case ast.KindThisKeyword:
@@ -1710,7 +1710,7 @@ func (c *Checker) writeFlowCacheKey(b *keyBuilder, node *ast.Node, declaredType 
 					return false
 				}
 				b.writeString(".@")
-				b.writeSymbol(symbol)
+				b.writeSymbolId(c.getSymbolId(symbol))
 				return true
 			}
 		}

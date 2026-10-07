@@ -972,7 +972,7 @@ func (b *NodeBuilderImpl) getNameOfSymbolFromNameType(symbol *ast.Symbol) string
 * It will also use a representation of a number as written instead of a decimal form, e.g. `0o11` instead of `9`.
  */
 func (b *NodeBuilderImpl) getNameOfSymbolAsWritten(symbol *ast.Symbol) string {
-	result, ok := b.ctx.remappedSymbolReferences[ast.GetSymbolId(symbol)]
+	result, ok := b.ctx.remappedSymbolReferences[b.ch.getSymbolId(symbol)]
 	if ok {
 		symbol = result
 	}
@@ -1037,7 +1037,7 @@ func (b *NodeBuilderImpl) getTypeParametersOfClassOrInterface(symbol *ast.Symbol
 func (b *NodeBuilderImpl) lookupTypeParameterNodes(chain []*ast.Symbol, index int) *ast.TypeParameterList {
 	debug.Assert(chain != nil && 0 <= index && index < len(chain))
 	symbol := chain[index]
-	symbolId := ast.GetSymbolId(symbol)
+	symbolId := b.ch.getSymbolId(symbol)
 	if b.ctx.typeParameterSymbolList.Has(symbolId) {
 		return nil
 	}
@@ -2105,7 +2105,7 @@ func (b *NodeBuilderImpl) serializeReturnTypeForSignature(signature *Signature, 
 	if signature.declaration != nil && !ast.NodeIsSynthesized(signature.declaration) {
 		symbol := b.ch.getSymbolOfDeclaration(signature.declaration)
 		var ok bool
-		returnType, ok = b.ctx.enclosingSymbolTypes[ast.GetSymbolId(symbol)]
+		returnType, ok = b.ctx.enclosingSymbolTypes[b.ch.getSymbolId(symbol)]
 		if !ok || returnType == nil {
 			returnType = b.ch.instantiateType(b.ch.getReturnTypeOfSignature(signature), b.ctx.mapper)
 		}
@@ -2271,7 +2271,7 @@ func (b *NodeBuilderImpl) serializeTypeForDeclaration(declaration *ast.Declarati
 				t = b.ch.errorType
 			}
 		} else {
-			t = b.ctx.enclosingSymbolTypes[ast.GetSymbolId(symbol)]
+			t = b.ctx.enclosingSymbolTypes[b.ch.getSymbolId(symbol)]
 			if t == nil {
 				if symbol.Flags&ast.SymbolFlagsAccessor != 0 && declaration.Kind == ast.KindSetAccessor {
 					t = b.ch.instantiateType(b.ch.getWriteTypeOfSymbol(symbol), b.ctx.mapper)
@@ -3257,7 +3257,7 @@ func (b *NodeBuilderImpl) visitAndTransformType(t *Type, transform func(b *NodeB
 	case t.flags&TypeFlagsConditional != 0:
 		id = &CompositeSymbolIdentity{false, 0, ast.GetNodeId(t.AsConditionalType().root.node.AsNode())}
 	case t.symbol != nil:
-		id = &CompositeSymbolIdentity{isConstructorObject, ast.GetSymbolId(t.symbol), 0}
+		id = &CompositeSymbolIdentity{isConstructorObject, b.ch.getSymbolId(t.symbol), 0}
 	default:
 		id = nil
 	}
@@ -3753,7 +3753,7 @@ func (b *NodeBuilderImpl) lookupInstantiatedTypeArgumentNodes(chain []*ast.Symbo
 func (b *NodeBuilderImpl) lookupExpressionChainTypeArgumentNodes(chain []*ast.Symbol, index int) *ast.TypeParameterList {
 	if b.shouldWriteTypeParametersInQualifiedName(chain, index) {
 		symbol := chain[index]
-		symbolId := ast.GetSymbolId(symbol)
+		symbolId := b.ch.getSymbolId(symbol)
 		if b.ctx.typeParameterSymbolList.Has(symbolId) {
 			return nil
 		}

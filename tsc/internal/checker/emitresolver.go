@@ -179,11 +179,11 @@ func (r *EmitResolver) markLinkedAliases(node *ast.Node) {
 
 	visited := make(map[ast.SymbolId]struct{}, 2) // guard against circular imports
 	for exportSymbol != nil {
-		_, seen := visited[ast.GetSymbolId(exportSymbol)]
+		_, seen := visited[r.checker.getSymbolId(exportSymbol)]
 		if seen {
 			break
 		}
-		visited[ast.GetSymbolId(exportSymbol)] = struct{}{}
+		visited[r.checker.getSymbolId(exportSymbol)] = struct{}{}
 
 		var nextSymbol *ast.Symbol
 		for _, declaration := range exportSymbol.Declarations {

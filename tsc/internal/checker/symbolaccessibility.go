@@ -418,20 +418,20 @@ func symbolTableIDFromLocals(node *ast.Node) symbolTableID {
 	return stKindLocals | symbolTableID(ast.GetNodeId(node))
 }
 
-func symbolTableIDFromExports(sym *ast.Symbol) symbolTableID {
-	return stKindExports | symbolTableID(ast.GetSymbolId(sym))
+func (c *Checker) symbolTableIDFromExports(sym *ast.Symbol) symbolTableID {
+	return stKindExports | symbolTableID(c.getSymbolId(sym))
 }
 
 // symbolTableIDFromResolvedExports returns an ID for resolved/derived export tables
 // (e.g. from getExportsOfSymbol/getExportsOfModule which may include export * resolution
 // and late-bound members). This is distinct from symbolTableIDFromExports to prevent
 // cache collisions with raw sym.Exports tables passed by someSymbolTableInScope.
-func symbolTableIDFromResolvedExports(sym *ast.Symbol) symbolTableID {
-	return stKindResolvedExports | symbolTableID(ast.GetSymbolId(sym))
+func (c *Checker) symbolTableIDFromResolvedExports(sym *ast.Symbol) symbolTableID {
+	return stKindResolvedExports | symbolTableID(c.getSymbolId(sym))
 }
 
-func symbolTableIDFromMembers(sym *ast.Symbol) symbolTableID {
-	return stKindMembers | symbolTableID(ast.GetSymbolId(sym))
+func (c *Checker) symbolTableIDFromMembers(sym *ast.Symbol) symbolTableID {
+	return stKindMembers | symbolTableID(c.getSymbolId(sym))
 }
 
 func symbolTableIDFromGlobals() symbolTableID {
@@ -479,7 +479,7 @@ func (c *Checker) getAccessibleSymbolChainEx(ctx accessibleSymbolChainContext) [
 * @param {ignoreQualification} boolean Set when a symbol is being looked for through the exports of another symbol (meaning we have a route to qualify it already)
  */
 func (c *Checker) getAccessibleSymbolChainFromSymbolTable(ctx accessibleSymbolChainContext, t ast.SymbolTable, tableId symbolTableID, ignoreQualification bool, isLocalNameLookup bool) []*ast.Symbol {
-	symId := ast.GetSymbolId(ctx.symbol)
+	symId := c.getSymbolId(ctx.symbol)
 	visitedSymbolTables, ok := ctx.visitedSymbolTablesMap[symId]
 	if !ok {
 		visitedSymbolTables = make(map[symbolTableID]struct{})
@@ -633,7 +633,7 @@ func (c *Checker) getCandidateListForSymbol(
 	if candidateTable == nil {
 		return nil
 	}
-	candidateTableId := symbolTableIDFromResolvedExports(resolvedImportedSymbol)
+	candidateTableId := c.symbolTableIDFromResolvedExports(resolvedImportedSymbol)
 	accessibleSymbolsFromExports := c.getAccessibleSymbolChainFromSymbolTable(ctx, candidateTable, candidateTableId /*ignoreQualification*/, true, false)
 	if len(accessibleSymbolsFromExports) == 0 {
 		return nil
@@ -771,7 +771,7 @@ func (c *Checker) someSymbolTableInScope(
 				break
 			}
 			sym := c.getSymbolOfDeclaration(ast.GetReparsedNodeForNode(location))
-			if callback(sym.Exports, symbolTableIDFromExports(sym), false, true, location) {
+			if callback(sym.Exports, c.symbolTableIDFromExports(sym), false, true, location) {
 				return true
 			}
 		case ast.KindClassDeclaration, ast.KindClassExpression, ast.KindInterfaceDeclaration:
@@ -793,7 +793,7 @@ func (c *Checker) someSymbolTableInScope(
 					table[key] = memberSymbol
 				}
 			}
-			if table != nil && callback(table, symbolTableIDFromMembers(sym), false, false, location) {
+			if table != nil && callback(table, c.symbolTableIDFromMembers(sym), false, false, location) {
 				return true
 			}
 			// Class expression names (e.g., `B` in `class B {}`) are not stored in any

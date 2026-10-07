@@ -1,0 +1,61 @@
+//// [tests/cases/compiler/namespaceImportAndImportTypeUnionOrder.ts] ////
+
+=== defaults.ts ===
+export const retries = 3;
+>retries : Symbol(retries, Decl(defaults.ts, 0, 12))
+
+export default { retries };
+>retries : Symbol(retries, Decl(defaults.ts, 1, 16))
+
+=== use0.ts ===
+import * as defaults from "./defaults";
+>defaults : Symbol(defaults, Decl(use0.ts, 0, 6))
+
+export function getConfig(override?: typeof import("./defaults")) {
+>getConfig : Symbol(getConfig, Decl(use0.ts, 0, 39))
+>override : Symbol(override, Decl(use0.ts, 1, 26))
+
+    return override ?? defaults;
+>override : Symbol(override, Decl(use0.ts, 1, 26))
+>defaults : Symbol(defaults, Decl(use0.ts, 0, 6))
+}
+
+=== use1.ts ===
+import * as defaults from "./defaults";
+>defaults : Symbol(defaults, Decl(use1.ts, 0, 6))
+
+export function getConfig(override?: typeof import("./defaults")) {
+>getConfig : Symbol(getConfig, Decl(use1.ts, 0, 39))
+>override : Symbol(override, Decl(use1.ts, 1, 26))
+
+    return override ?? defaults;
+>override : Symbol(override, Decl(use1.ts, 1, 26))
+>defaults : Symbol(defaults, Decl(use1.ts, 0, 6))
+}
+
+=== use2.ts ===
+import * as defaults from "./defaults";
+>defaults : Symbol(defaults, Decl(use2.ts, 0, 6))
+
+export function getConfig(override?: typeof import("./defaults")) {
+>getConfig : Symbol(getConfig, Decl(use2.ts, 0, 39))
+>override : Symbol(override, Decl(use2.ts, 1, 26))
+
+    return override ?? defaults;
+>override : Symbol(override, Decl(use2.ts, 1, 26))
+>defaults : Symbol(defaults, Decl(use2.ts, 0, 6))
+}
+
+=== use3.ts ===
+import * as defaults from "./defaults";
+>defaults : Symbol(defaults, Decl(use3.ts, 0, 6))
+
+export function getConfig(override?: typeof import("./defaults")) {
+>getConfig : Symbol(getConfig, Decl(use3.ts, 0, 39))
+>override : Symbol(override, Decl(use3.ts, 1, 26))
+
+    return override ?? defaults;
+>override : Symbol(override, Decl(use3.ts, 1, 26))
+>defaults : Symbol(defaults, Decl(use3.ts, 0, 6))
+}
+

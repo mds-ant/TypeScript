@@ -1,0 +1,76 @@
+//// [tests/cases/compiler/importedValueAndTypeSymbolsOrder.ts] ////
+
+=== graphics.d.ts ===
+declare namespace graphics {
+>graphics : Symbol(graphics, Decl(graphics.d.ts, 0, 0), Decl(graphics.d.ts, 3, 11))
+
+    interface Point { x: number; y: number }
+>Point : Symbol(Point, Decl(graphics.d.ts, 0, 28))
+>x : Symbol(Point.x, Decl(graphics.d.ts, 1, 21))
+>y : Symbol(Point.y, Decl(graphics.d.ts, 1, 32))
+}
+declare var graphics: { Point: new (x: number, y: number) => graphics.Point };
+>graphics : Symbol(graphics, Decl(graphics.d.ts, 0, 0), Decl(graphics.d.ts, 3, 11))
+>Point : Symbol(Point, Decl(graphics.d.ts, 3, 23))
+>x : Symbol(x, Decl(graphics.d.ts, 3, 36))
+>y : Symbol(y, Decl(graphics.d.ts, 3, 46))
+>graphics : Symbol(graphics, Decl(graphics.d.ts, 0, 0), Decl(graphics.d.ts, 3, 11))
+>Point : Symbol(graphics.Point, Decl(graphics.d.ts, 0, 28))
+
+declare module "graphics" {
+>"graphics" : Symbol("graphics", Decl(graphics.d.ts, 3, 78))
+
+    export = graphics;
+>graphics : Symbol(graphics, Decl(graphics.d.ts, 0, 0), Decl(graphics.d.ts, 3, 11))
+}
+
+=== a.ts ===
+import { Point as P1 } from "graphics";
+>Point : Symbol(Point, Decl(graphics.d.ts, 3, 23), Decl(graphics.d.ts, 0, 28))
+>P1 : Symbol(P1, Decl(a.ts, 0, 8))
+
+import { Point as P2 } from "graphics";
+>Point : Symbol(Point, Decl(graphics.d.ts, 3, 23), Decl(graphics.d.ts, 0, 28))
+>P2 : Symbol(P2, Decl(a.ts, 1, 8))
+
+import { Point as P3 } from "graphics";
+>Point : Symbol(Point, Decl(graphics.d.ts, 3, 23), Decl(graphics.d.ts, 0, 28))
+>P3 : Symbol(P3, Decl(a.ts, 2, 8))
+
+declare const c: boolean;
+>c : Symbol(c, Decl(a.ts, 3, 13))
+
+declare const p1: P1[];
+>p1 : Symbol(p1, Decl(a.ts, 4, 13))
+>P1 : Symbol(P1, Decl(a.ts, 0, 8))
+
+declare const p2: P2[];
+>p2 : Symbol(p2, Decl(a.ts, 5, 13))
+>P2 : Symbol(P2, Decl(a.ts, 1, 8))
+
+declare const p3: P3[];
+>p3 : Symbol(p3, Decl(a.ts, 6, 13))
+>P3 : Symbol(P3, Decl(a.ts, 2, 8))
+
+export const first = c ? p1 : p3;
+>first : Symbol(first, Decl(a.ts, 7, 12))
+>c : Symbol(c, Decl(a.ts, 3, 13))
+>p1 : Symbol(p1, Decl(a.ts, 4, 13))
+>p3 : Symbol(p3, Decl(a.ts, 6, 13))
+
+export const made = new P2(0, 0);
+>made : Symbol(made, Decl(a.ts, 8, 12))
+>P2 : Symbol(P2, Decl(a.ts, 1, 8))
+
+export const u = c ? p1 : p2;
+>u : Symbol(u, Decl(a.ts, 9, 12))
+>c : Symbol(c, Decl(a.ts, 3, 13))
+>p1 : Symbol(p1, Decl(a.ts, 4, 13))
+>p2 : Symbol(p2, Decl(a.ts, 5, 13))
+
+export const v = c ? p2 : p1;
+>v : Symbol(v, Decl(a.ts, 10, 12))
+>c : Symbol(c, Decl(a.ts, 3, 13))
+>p2 : Symbol(p2, Decl(a.ts, 5, 13))
+>p1 : Symbol(p1, Decl(a.ts, 4, 13))
+

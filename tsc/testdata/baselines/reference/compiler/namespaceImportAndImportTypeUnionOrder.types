@@ -1,0 +1,67 @@
+//// [tests/cases/compiler/namespaceImportAndImportTypeUnionOrder.ts] ////
+
+=== defaults.ts ===
+export const retries = 3;
+>retries : 3
+>3 : 3
+
+export default { retries };
+>{ retries } : { retries: number; }
+>retries : number
+
+=== use0.ts ===
+import * as defaults from "./defaults";
+>defaults : typeof defaults
+
+export function getConfig(override?: typeof import("./defaults")) {
+>getConfig : (override?: typeof import("./defaults")) => typeof import("./defaults")
+>override : typeof import("./defaults") | undefined
+
+    return override ?? defaults;
+>override ?? defaults : typeof import("./defaults")
+>override : typeof import("./defaults") | undefined
+>defaults : typeof defaults
+}
+
+=== use1.ts ===
+import * as defaults from "./defaults";
+>defaults : typeof defaults
+
+export function getConfig(override?: typeof import("./defaults")) {
+>getConfig : (override?: typeof import("./defaults")) => typeof import("./defaults")
+>override : typeof import("./defaults") | undefined
+
+    return override ?? defaults;
+>override ?? defaults : typeof import("./defaults")
+>override : typeof import("./defaults") | undefined
+>defaults : typeof defaults
+}
+
+=== use2.ts ===
+import * as defaults from "./defaults";
+>defaults : typeof defaults
+
+export function getConfig(override?: typeof import("./defaults")) {
+>getConfig : (override?: typeof import("./defaults")) => typeof import("./defaults")
+>override : typeof import("./defaults") | undefined
+
+    return override ?? defaults;
+>override ?? defaults : typeof import("./defaults")
+>override : typeof import("./defaults") | undefined
+>defaults : typeof defaults
+}
+
+=== use3.ts ===
+import * as defaults from "./defaults";
+>defaults : typeof defaults
+
+export function getConfig(override?: typeof import("./defaults")) {
+>getConfig : (override?: typeof import("./defaults")) => typeof import("./defaults")
+>override : typeof import("./defaults") | undefined
+
+    return override ?? defaults;
+>override ?? defaults : typeof import("./defaults")
+>override : typeof import("./defaults") | undefined
+>defaults : typeof defaults
+}
+

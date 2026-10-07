@@ -1,0 +1,75 @@
+//// [tests/cases/compiler/importedValueAndTypeSymbolsOrder.ts] ////
+
+=== graphics.d.ts ===
+declare namespace graphics {
+    interface Point { x: number; y: number }
+>x : number
+>y : number
+}
+declare var graphics: { Point: new (x: number, y: number) => graphics.Point };
+>graphics : { Point: new (x: number, y: number) => graphics.Point; }
+>Point : new (x: number, y: number) => graphics.Point
+>x : number
+>y : number
+>graphics : any
+
+declare module "graphics" {
+>"graphics" : typeof import("graphics")
+
+    export = graphics;
+>graphics : { Point: new (x: number, y: number) => graphics.Point; }
+}
+
+=== a.ts ===
+import { Point as P1 } from "graphics";
+>Point : new (x: number, y: number) => graphics.Point
+>P1 : new (x: number, y: number) => graphics.Point
+
+import { Point as P2 } from "graphics";
+>Point : new (x: number, y: number) => graphics.Point
+>P2 : new (x: number, y: number) => graphics.Point
+
+import { Point as P3 } from "graphics";
+>Point : new (x: number, y: number) => graphics.Point
+>P3 : new (x: number, y: number) => graphics.Point
+
+declare const c: boolean;
+>c : boolean
+
+declare const p1: P1[];
+>p1 : P1[]
+
+declare const p2: P2[];
+>p2 : P2[]
+
+declare const p3: P3[];
+>p3 : P3[]
+
+export const first = c ? p1 : p3;
+>first : P3[]
+>c ? p1 : p3 : P3[]
+>c : boolean
+>p1 : P1[]
+>p3 : P3[]
+
+export const made = new P2(0, 0);
+>made : graphics.Point
+>new P2(0, 0) : graphics.Point
+>P2 : new (x: number, y: number) => graphics.Point
+>0 : 0
+>0 : 0
+
+export const u = c ? p1 : p2;
+>u : P1[]
+>c ? p1 : p2 : P1[]
+>c : boolean
+>p1 : P1[]
+>p2 : P2[]
+
+export const v = c ? p2 : p1;
+>v : P1[]
+>c ? p2 : p1 : P1[]
+>c : boolean
+>p2 : P2[]
+>p1 : P1[]
+
